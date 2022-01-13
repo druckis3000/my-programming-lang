@@ -1,7 +1,7 @@
 package mpl.compiler.asm;
 
 import mpl.compiler.CompilerOptions;
-import mpl.parser.syntactic.parts.PDataType;
+import mpl.syntactic.parts.PDataType;
 
 public enum AsmRegister {
 	EAX("al", "ax", "eax", "rax"),

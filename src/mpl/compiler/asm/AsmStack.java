@@ -5,11 +5,11 @@ import static mpl.compiler.asm.AsmCommon.movToRegister;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import mpl.parser.syntactic.parts.PDataType;
-import mpl.parser.syntactic.parts.PIntegerLiteral;
-import mpl.parser.syntactic.parts.PStackElement;
-import mpl.parser.syntactic.parts.PStringLiteral;
-import mpl.parser.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.PDataType;
+import mpl.syntactic.parts.PIntegerLiteral;
+import mpl.syntactic.parts.PStackElement;
+import mpl.syntactic.parts.PStringLiteral;
+import mpl.syntactic.parts.PVarAccessor;
 
 public class AsmStack {
 	private static final String nl = System.lineSeparator();

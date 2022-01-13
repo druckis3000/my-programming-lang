@@ -3,11 +3,10 @@ package mpl.compiler;
 import java.io.File;
 import java.io.IOException;
 
-import mpl.analysis.SemanticAnalyser;
+import mpl.analysis.semantic.SemanticAnalyser;
+import mpl.analysis.syntactic.ASTCreator;
 import mpl.compiler.asm.AssemblyCodeBuilder;
-import mpl.parser.ParserException;
-import mpl.parser.syntactic.ASTCreator;
-import mpl.parser.syntactic.parts.PProgram;
+import mpl.syntactic.parts.PProgram;
 import mpl.utils.ProcessEx;
 import mpl.utils.io.FileHelper;
 
@@ -109,8 +108,6 @@ public class Compiler {
 			if(options.outputFormat != CompilerOptions.COMPILE_FORMAT_LIB)
 				new ProcessEx("sh -c ./output", "/home/daslee/Desktop").start();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserException e) {
 			e.printStackTrace();
 		}
 	}

@@ -1,19 +1,19 @@
 package mpl.compiler.asm;
 
-import mpl.parser.syntactic.parts.PBooleanLiteral;
-import mpl.parser.syntactic.parts.PCharLiteral;
-import mpl.parser.syntactic.parts.PDataType;
-import mpl.parser.syntactic.parts.PFunctionCall;
-import mpl.parser.syntactic.parts.PFunctionParameter;
-import mpl.parser.syntactic.parts.PGlobalVariable;
-import mpl.parser.syntactic.parts.PHexLiteral;
-import mpl.parser.syntactic.parts.PIntegerLiteral;
-import mpl.parser.syntactic.parts.PLocalVariable;
-import mpl.parser.syntactic.parts.PNullLiteral;
-import mpl.parser.syntactic.parts.PProgramPart;
-import mpl.parser.syntactic.parts.PStringLiteral;
-import mpl.parser.syntactic.parts.PVarAccessor;
-import mpl.parser.syntactic.parts.PVariable;
+import mpl.syntactic.parts.PBooleanLiteral;
+import mpl.syntactic.parts.PCharLiteral;
+import mpl.syntactic.parts.PDataType;
+import mpl.syntactic.parts.PFunctionCall;
+import mpl.syntactic.parts.PFunctionParameter;
+import mpl.syntactic.parts.PGlobalVariable;
+import mpl.syntactic.parts.PHexLiteral;
+import mpl.syntactic.parts.PIntegerLiteral;
+import mpl.syntactic.parts.PLocalVariable;
+import mpl.syntactic.parts.PNullLiteral;
+import mpl.syntactic.parts.PProgramPart;
+import mpl.syntactic.parts.PStringLiteral;
+import mpl.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.PVariable;
 
 public class AsmCommon {
 	

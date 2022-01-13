@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
-import mpl.analysis.SemanticAnalyser;
+import mpl.analysis.semantic.SemanticAnalyser;
 import mpl.compiler.CompilerOptions;
 import mpl.compiler.asm.AssemblyCodeBuilder;
-import mpl.parser.ParserException;
-import mpl.parser.syntactic.parts.PFunction;
+import mpl.syntactic.parts.PFunction;
 import mpl.utils.Env;
 import mpl.utils.ProcessEx;
 import mpl.utils.io.Console;
@@ -147,15 +146,11 @@ public class ProjectManager {
 	 * and it's sub packages */
 	private void compileToAssemblyFirstStage(Package p){
 		for(Source src : p.sourceFiles){
-			try {
-				System.out.println("Compiling: " + p.getFullName() + "/" + src.fileName);
-				
-				// Do semantic analysis
-				SemanticAnalyser analyser = new SemanticAnalyser(src.sourceAST);
-				analyser.analyze();
-			} catch (ParserException e) {
-				e.printStackTrace();
-			}
+			System.out.println("Compiling: " + p.getFullName() + "/" + src.fileName);
+			
+			// Do semantic analysis
+			SemanticAnalyser analyser = new SemanticAnalyser(src.sourceAST);
+			analyser.analyze();
 		}
 		
 		// Do semantic analysis for sub-packages

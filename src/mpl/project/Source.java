@@ -2,8 +2,8 @@ package mpl.project;
 
 import java.io.File;
 
-import mpl.parser.syntactic.ASTCreator;
-import mpl.parser.syntactic.parts.PProgram;
+import mpl.analysis.syntactic.ASTCreator;
+import mpl.syntactic.parts.PProgram;
 
 /* Class that holds information about source file.
  * It also has reference to the abstract syntax tree (PProgram)

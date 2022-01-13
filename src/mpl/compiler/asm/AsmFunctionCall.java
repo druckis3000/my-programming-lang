@@ -1,16 +1,16 @@
 package mpl.compiler.asm;
 
-import mpl.parser.syntactic.parts.PDataType;
-import mpl.parser.syntactic.parts.PExpression;
-import mpl.parser.syntactic.parts.PFunction;
-import mpl.parser.syntactic.parts.PFunctionCall;
-import mpl.parser.syntactic.parts.PFunctionParameter;
-import mpl.parser.syntactic.parts.PIntegerLiteral;
-import mpl.parser.syntactic.parts.PProgramPart;
-import mpl.parser.syntactic.parts.PRegister;
-import mpl.parser.syntactic.parts.PStackElement;
-import mpl.parser.syntactic.parts.PStringLiteral;
-import mpl.parser.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.PDataType;
+import mpl.syntactic.parts.PExpression;
+import mpl.syntactic.parts.PFunction;
+import mpl.syntactic.parts.PFunctionCall;
+import mpl.syntactic.parts.PFunctionParameter;
+import mpl.syntactic.parts.PIntegerLiteral;
+import mpl.syntactic.parts.PProgramPart;
+import mpl.syntactic.parts.PRegister;
+import mpl.syntactic.parts.PStackElement;
+import mpl.syntactic.parts.PStringLiteral;
+import mpl.syntactic.parts.PVarAccessor;
 
 public class AsmFunctionCall {
 	private static final String nl = System.lineSeparator();

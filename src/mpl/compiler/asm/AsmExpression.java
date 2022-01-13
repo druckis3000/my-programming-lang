@@ -4,20 +4,20 @@ import static mpl.compiler.asm.AsmCommon.*;
 
 import java.util.ArrayList;
 
-import mpl.parser.syntactic.parts.PAssignmentStatement;
-import mpl.parser.syntactic.parts.PCharLiteral;
-import mpl.parser.syntactic.parts.PDataType;
-import mpl.parser.syntactic.parts.PExpression;
-import mpl.parser.syntactic.parts.PFunctionCall;
-import mpl.parser.syntactic.parts.PHexLiteral;
-import mpl.parser.syntactic.parts.PIntegerLiteral;
-import mpl.parser.syntactic.parts.POperator;
-import mpl.parser.syntactic.parts.PStringLiteral;
-import mpl.parser.syntactic.parts.POperator.POperatorType;
-import mpl.parser.syntactic.parts.PProgramPart;
-import mpl.parser.syntactic.parts.PRegister;
-import mpl.parser.syntactic.parts.PStackElement;
-import mpl.parser.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.PAssignmentStatement;
+import mpl.syntactic.parts.PCharLiteral;
+import mpl.syntactic.parts.PDataType;
+import mpl.syntactic.parts.PExpression;
+import mpl.syntactic.parts.PFunctionCall;
+import mpl.syntactic.parts.PHexLiteral;
+import mpl.syntactic.parts.PIntegerLiteral;
+import mpl.syntactic.parts.POperator;
+import mpl.syntactic.parts.PProgramPart;
+import mpl.syntactic.parts.PRegister;
+import mpl.syntactic.parts.PStackElement;
+import mpl.syntactic.parts.PStringLiteral;
+import mpl.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.POperator.POperatorType;
 
 public class AsmExpression {
 	private static final String nl = System.lineSeparator();

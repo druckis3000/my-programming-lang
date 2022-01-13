@@ -2,7 +2,7 @@ package mpl.compiler.asm;
 
 import mpl.compiler.asm.sections.AsmSectionData;
 import mpl.compiler.asm.sections.AsmSymbols;
-import mpl.parser.syntactic.parts.PProgram;
+import mpl.syntactic.parts.PProgram;
 
 public class AsmProgram {
 

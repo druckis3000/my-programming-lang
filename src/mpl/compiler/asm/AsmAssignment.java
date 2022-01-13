@@ -1,17 +1,17 @@
 package mpl.compiler.asm;
 
-import mpl.parser.syntactic.parts.PAssignmentStatement;
-import mpl.parser.syntactic.parts.PBooleanLiteral;
-import mpl.parser.syntactic.parts.PCharLiteral;
-import mpl.parser.syntactic.parts.PFunctionCall;
-import mpl.parser.syntactic.parts.PHexLiteral;
-import mpl.parser.syntactic.parts.PIntegerLiteral;
-import mpl.parser.syntactic.parts.PLocalVariable;
-import mpl.parser.syntactic.parts.PNewOperand;
-import mpl.parser.syntactic.parts.PNullLiteral;
-import mpl.parser.syntactic.parts.PStringLiteral;
-import mpl.parser.syntactic.parts.PStructType;
-import mpl.parser.syntactic.parts.PVarAccessor;
+import mpl.syntactic.parts.PAssignmentStatement;
+import mpl.syntactic.parts.PBooleanLiteral;
+import mpl.syntactic.parts.PCharLiteral;
+import mpl.syntactic.parts.PFunctionCall;
+import mpl.syntactic.parts.PHexLiteral;
+import mpl.syntactic.parts.PIntegerLiteral;
+import mpl.syntactic.parts.PLocalVariable;
+import mpl.syntactic.parts.PNewOperand;
+import mpl.syntactic.parts.PNullLiteral;
+import mpl.syntactic.parts.PStringLiteral;
+import mpl.syntactic.parts.PStructType;
+import mpl.syntactic.parts.PVarAccessor;
 
 public class AsmAssignment {
 	public static final String nl = System.lineSeparator();
