@@ -5,26 +5,26 @@ function int gimmeInt(int x, int y)
 	return x + y;
 }
 
-typedef Bakas as struct {
-	int talpa;
+typedef FuelTank as struct {
+	int capacity;
 }
 
-typedef Masina as struct {
-	int ratuDydis;
-	int greitis;
-	Bakas kuroBakas;
+typedef Car as struct {
+	int wheelSize;
+	int speed;
+	FuelTank fuelTank;
 }
 
-function setInfo(int ratuDydis, int greitis, int bakoTalpa) (Masina)
+function setInfo(int wheelSize, int speed, int fuelTankCapacity) (Car)
 {
-	this.ratuDydis = ratuDydis;
-	this.greitis = greitis;
-	this.kuroBakas.talpa = bakoTalpa;
+	this.wheelSize = wheelSize;
+	this.speed = speed;
+	this.fuelTank.capacity = fuelTankCapacity;
 }
 
-function printInfo() (Masina)
+function printInfo() (Car)
 {
-	printf("rDydis: %d, greitis: %d, bako talpa: %d\n", this.ratuDydis, this.greitis, this.kuroBakas.talpa);
+	printf("wheel size: %d, speed: %d, fuel tank capacity: %d\n", this.wheelSize, this.speed, this.fuelTank.capacity);
 }
 
 int heapVariable = 5;
@@ -56,41 +56,41 @@ function main()
 	
 	
 	
-	Masina m;
+	Car car;
 	
-	m.ratuDydis = 18;
-	m.greitis = 200;
-	m.kuroBakas.talpa = 68;
-	printf("&m: %x\n", &m);
-	printf("&m.greitis: %x\n", &m.greitis);
-	m.printInfo();
+	car.wheelSize = 18;
+	car.speed = 200;
+	car.fuelTank.capacity = 68;
+	printf("&car: %x\n", &car);
+	printf("&car.greitis: %x\n", &car.speed);
+	car.printInfo();
 	
-	m.setInfo(15, 113, 70);
-	m.printInfo();
+	car.setInfo(15, 113, 70);
+	car.printInfo();
 	
 	printf("\n");
 	
-	Masina *mPtr = &m;
+	Car *cPtr = &car;
 	//int sudas = (int)(*(mPtr + 4));
 	
-	printf("*mPtr: %d, *(mPtr+8): %d\n", *mPtr, *(mPtr+8));
+	printf("*cPtr: %d, *(cPtr+8): %d\n", *cPtr, *(cPtr+8));
 	
-	Masina ms[2];
-	ms[0].setInfo(11, 111, 1111);
-	ms[1].setInfo(23, 232, 3232);
+	Car cs[2];
+	cs[0].setInfo(11, 111, 1111);
+	cs[1].setInfo(23, 232, 3232);
 	
 	int i=0;
-	while(i < (sizeof(ms) / sizeof(m))){
-		printf("&ms[%d]: %x\n", i, &ms[i]);
+	while(i < (sizeof(cs) / sizeof(car))){
+		printf("&cs[%d]: %x\n", i, &cs[i]);
 		i++;
 	}
 	
-	for(int z=0; z<(sizeof(ms) / sizeof(m)); z++){
-		ms[z].printInfo();
+	for(int z=0; z<(sizeof(cs) / sizeof(car)); z++){
+		cs[z].printInfo();
 	}
 	
-	for bibis in ms {
-		bibis.printInfo();
+	for carr in cs {
+		carr.printInfo();
 	}
 }
 

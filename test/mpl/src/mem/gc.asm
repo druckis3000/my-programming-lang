@@ -76,7 +76,7 @@ gc_GCInit_v:
 	mov DWORD [gc_heapMemoryStart], __data_start
 	mov DWORD [gc_heapMemoryEnd], _end
 	; Push "heap start address: 0x%x\n" onto the stack
-	mov DWORD [esp + 0], lc14
+	mov DWORD [esp + 0], lc16
 	
 	; Push the address contained in variable 'heapMemoryStart' onto the stack
 	mov ebx, DWORD [gc_heapMemoryStart + 0]
@@ -86,7 +86,7 @@ gc_GCInit_v:
 	call printf
 
 	; Push "heap end address: 0x%x\n" onto the stack
-	mov DWORD [esp + 0], lc15
+	mov DWORD [esp + 0], lc17
 	
 	; Push the address contained in variable 'heapMemoryEnd' onto the stack
 	mov ebx, DWORD [gc_heapMemoryEnd + 0]
@@ -123,5 +123,5 @@ SECTION .data
 
 
 SECTION .rodata
-lc14: db "heap start address: 0x%x", 0x0A, 0
-lc15: db "heap end address: 0x%x", 0x0A, 0
+lc16: db "heap start address: 0x%x", 0x0A, 0
+lc17: db "heap end address: 0x%x", 0x0A, 0
