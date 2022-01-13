@@ -1,0 +1,10 @@
+for testing
+2016-11
+*.jpg
+*.png
+*.svg
+TODO
+bin
+.classpath
+.project
+.settings
