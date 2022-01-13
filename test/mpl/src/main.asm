@@ -2,7 +2,6 @@ EXTERN malloc
 EXTERN free
 EXTERN __data_start
 EXTERN _end
-EXTERN scanf
 EXTERN printf
 EXTERN gc_GCInit_v
 GLOBAL main_heapVariable
@@ -127,7 +126,7 @@ main:
 	mov ebp, esp
 
 	; Allocate space for local variables and function call arguments
-	sub esp, 140
+	sub esp, 112
 
 	; Push 0 onto the stack
 	mov DWORD [esp + 0], 0
@@ -136,14 +135,14 @@ main:
 	call gc_GCInit_v
 
 	; a = 10
-	mov DWORD [ebp - 111], 10
+	mov DWORD [ebp - 81], 10
 
 	; b = 5
-	mov DWORD [ebp - 107], 5
+	mov DWORD [ebp - 77], 5
 
 	; a / b
-	mov ebx, DWORD [ebp - 107]
-	mov eax, DWORD [ebp - 111]
+	mov ebx, DWORD [ebp - 77]
+	mov eax, DWORD [ebp - 81]
 	cdq
 	idiv ebx
 	mov DWORD [esp + 8], eax
@@ -153,8 +152,8 @@ main:
 	mov DWORD [esp + 0], eax
 	
 	; a / b
-	mov ebx, DWORD [ebp - 107]
-	mov eax, DWORD [ebp - 111]
+	mov ebx, DWORD [ebp - 77]
+	mov eax, DWORD [ebp - 81]
 	cdq
 	idiv ebx
 	mov DWORD [esp + 8], eax
@@ -188,7 +187,7 @@ main:
 	mov DWORD [esp + 8], eax
 	
 	; b / 2
-	mov eax, DWORD [ebp - 107]
+	mov eax, DWORD [ebp - 77]
 	cdq
 	mov ebx, 2
 	idiv ebx
@@ -208,8 +207,8 @@ main:
 	mov DWORD [esp + 8], eax
 	
 	; a / b
-	mov ebx, DWORD [ebp - 107]
-	mov eax, DWORD [ebp - 111]
+	mov ebx, DWORD [ebp - 77]
+	mov eax, DWORD [ebp - 81]
 	cdq
 	idiv ebx
 	mov DWORD [esp + 12], eax
@@ -242,7 +241,7 @@ main:
 	mov DWORD [esp + 12], eax
 	
 	; b / 2
-	mov eax, DWORD [ebp - 107]
+	mov eax, DWORD [ebp - 77]
 	cdq
 	mov ebx, 2
 	idiv ebx
@@ -268,33 +267,33 @@ main:
 	
 	; c = ((gimmeInt(a / b, a / b - 1) * 123) / 13 + b / 2 * 7) * ((gimmeInt(a / b, 1) * 123) / 13 + b / 2 * 7)
 	mov eax, [esp + 8]
-	mov DWORD [ebp - 103], eax
+	mov DWORD [ebp - 73], eax
 
 	; Push "c: %d, b: %d\n" onto the stack
 	mov DWORD [esp + 0], lc1
 	
 	; Push the contents of variable 'c' onto the stack
-	mov ebx, DWORD [ebp - 103]
+	mov ebx, DWORD [ebp - 73]
 	mov DWORD [esp + 4], ebx
 	
 	; Push the contents of variable 'b' onto the stack
-	mov ebx, DWORD [ebp - 107]
+	mov ebx, DWORD [ebp - 77]
 	mov DWORD [esp + 8], ebx
 	
 	; printf("c: %d, b: %d\n", c, b)
 	call printf
 
 	; boolTest = -123
-	mov DWORD [ebp - 99], -123
+	mov DWORD [ebp - 69], -123
 
 	; test = boolTest
-	mov ebx, DWORD [ebp - 99]
+	mov ebx, DWORD [ebp - 69]
 	cmp ebx, 0
-	setg BYTE [ebp - 95]
+	setg BYTE [ebp - 65]
 
 	; if(test == 1) {
 	; Condition testing (test == 1)
-	movsx eax, BYTE [ebp - 95]
+	movsx eax, BYTE [ebp - 65]
 	cmp eax, 1
 	jne .if0_else
 	.if0:
@@ -317,12 +316,12 @@ main:
 	.if0_end:
 
 	; bp = &test
-	lea ebx, [ebp - 95]
-	mov DWORD [ebp - 94], ebx
+	lea ebx, [ebp - 65]
+	mov DWORD [ebp - 64], ebx
 
 	; if(*bp == 1) {
 	; Condition testing (*bp == 1)
-	mov eax, DWORD [ebp - 94]
+	mov eax, DWORD [ebp - 64]
 	movsx eax, BYTE [eax]
 	cmp eax, 1
 	jne .if1_end
@@ -337,19 +336,19 @@ main:
 	.if1_end:
 
 	; car.wheelSize = 18
-	mov DWORD [ebp - 90], 18
+	mov DWORD [ebp - 60], 18
 
 	; car.speed = 200
-	mov DWORD [ebp - 86], 200
+	mov DWORD [ebp - 56], 200
 
 	; car.fuelTank.capacity = 68
-	mov DWORD [ebp - 82], 68
+	mov DWORD [ebp - 52], 68
 
 	; Push "&car: %x\n" onto the stack
 	mov DWORD [esp + 0], lc5
 	
 	; Push the address of variable '&car' onto the stack
-	lea ebx, [ebp - 90]
+	lea ebx, [ebp - 60]
 	mov DWORD [esp + 4], ebx
 	
 	; printf("&car: %x\n", &car)
@@ -359,7 +358,7 @@ main:
 	mov DWORD [esp + 0], lc6
 	
 	; Push the address of variable '&car.speed' onto the stack
-	lea ebx, [ebp - 90]
+	lea ebx, [ebp - 60]
 	lea ebx, [ebx + 4 + 0]
 	mov DWORD [esp + 4], ebx
 	
@@ -367,14 +366,14 @@ main:
 	call printf
 
 	; Push the address of variable '&car' onto the stack
-	lea ebx, [ebp - 90]
+	lea ebx, [ebp - 60]
 	mov DWORD [esp + 0], ebx
 	
 	; printInfo(&car)
 	call main_Car_Ptr_printInfo_S
 
 	; Push the address of variable '&car' onto the stack
-	lea ebx, [ebp - 90]
+	lea ebx, [ebp - 60]
 	mov DWORD [esp + 0], ebx
 	
 	; Push 15 onto the stack
@@ -390,7 +389,7 @@ main:
 	call main_Car_Ptr_setInfo_Sddd
 
 	; Push the address of variable '&car' onto the stack
-	lea ebx, [ebp - 90]
+	lea ebx, [ebp - 60]
 	mov DWORD [esp + 0], ebx
 	
 	; printInfo(&car)
@@ -403,20 +402,20 @@ main:
 	call printf
 
 	; cPtr = &car
-	lea ebx, [ebp - 90]
-	lea ecx, [ebp - 78]
+	lea ebx, [ebp - 60]
+	lea ecx, [ebp - 48]
 	mov DWORD [ecx], ebx
 
 	; Push "*cPtr: %d, *(cPtr+8): %d\n" onto the stack
 	mov DWORD [esp + 0], lc8
 	
 	; Push the contents of memory address, contained in variable '*cPtr' onto the stack
-	mov ebx, DWORD [ebp - 78]
+	mov ebx, DWORD [ebp - 48]
 	mov ebx, DWORD [ebx]
 	mov DWORD [esp + 4], ebx
 	
 	; cPtr + 8
-	mov ebx, DWORD [ebp - 78]
+	mov ebx, DWORD [ebp - 48]
 	add ebx, 8
 	mov DWORD [esp + 12], ebx
 	
@@ -436,7 +435,7 @@ main:
 	call printf
 
 	; Push the address of variable '&cs[0]' onto the stack
-	lea ebx, [ebp + 0 - 74]
+	lea ebx, [ebp + 0 - 44]
 	mov DWORD [esp + 0], ebx
 	
 	; Push 11 onto the stack
@@ -452,7 +451,7 @@ main:
 	call main_Car_Ptr_setInfo_Sddd
 
 	; Push the address of variable '&cs[1]' onto the stack
-	lea ebx, [ebp + 12 - 74]
+	lea ebx, [ebp + 12 - 44]
 	mov DWORD [esp + 0], ebx
 	
 	; Push 23 onto the stack
@@ -468,13 +467,13 @@ main:
 	call main_Car_Ptr_setInfo_Sddd
 
 	; i = 0
-	mov DWORD [ebp - 50], 0
+	mov DWORD [ebp - 20], 0
 
 	; while(i < 2) {
 	.while0_condition:
 	; Condition testing (i < 2)
 	mov eax, 2
-	mov ebx, DWORD [ebp - 50]
+	mov ebx, DWORD [ebp - 20]
 	cmp eax, ebx
 	jle .while0_done
 	.while0:
@@ -482,20 +481,20 @@ main:
 		mov DWORD [esp + 0], lc9
 		
 		; Push the contents of variable 'i' onto the stack
-		mov ebx, DWORD [ebp - 50]
+		mov ebx, DWORD [ebp - 20]
 		mov DWORD [esp + 4], ebx
 		
 		; Push the address of variable '&cs[i]' onto the stack
-		mov ebx, DWORD [ebp - 50]
+		mov ebx, DWORD [ebp - 20]
 		imul ebx, 12
-		lea ebx, [ebp + ebx - 74]
+		lea ebx, [ebp + ebx - 44]
 		mov DWORD [esp + 8], ebx
 		
 		; printf("&cs[%d]: %x\n", i, &cs[i])
 		call printf
 	
 		; i++
-		lea eax, [ebp - 50]
+		lea eax, [ebp - 20]
 		inc DWORD [eax]
 	jmp .while0_condition
 	; }
@@ -514,7 +513,7 @@ main:
 		; Push the address of variable '&cs[z]' onto the stack
 		mov ebx, DWORD [ebp - 16]
 		imul ebx, 12
-		lea ebx, [ebp + ebx - 74]
+		lea ebx, [ebp + ebx - 44]
 		mov DWORD [esp + 0], ebx
 		
 		; printInfo(&cs[z])
@@ -535,15 +534,15 @@ main:
 	; carr = cs[ebx]
 	mov ecx, ebx
 	imul ecx, 12
-	mov ecx, DWORD [ebp + ecx - 74]
+	mov ecx, DWORD [ebp + ecx - 44]
 	mov DWORD [ebp - 12], ecx
 	mov ecx, ebx
 	imul ecx, 12
-	mov ecx, DWORD [ebp + ecx - 70]
+	mov ecx, DWORD [ebp + ecx - 40]
 	mov DWORD [ebp - 8], ecx
 	mov ecx, ebx
 	imul ecx, 12
-	mov ecx, DWORD [ebp + ecx - 66]
+	mov ecx, DWORD [ebp + ecx - 36]
 	mov DWORD [ebp - 4], ecx
 	
 	; {
@@ -560,29 +559,9 @@ main:
 	jmp .forE0
 	.forE0_end:
 
-	; Push "hello: " onto the stack
-	mov DWORD [esp + 0], lc10
-	
-	; Push the address of variable '&testStr' onto the stack
-	lea ecx, [ebp - 46]
-	mov DWORD [esp + 4], ecx
-	
-	; scanf("hello: ", &testStr)
-	call main_scanf
-
-	; Push "output: %s\n" onto the stack
-	mov DWORD [esp + 0], lc11
-	
-	; Push the address of variable '&testStr' onto the stack
-	lea ecx, [ebp - 46]
-	mov DWORD [esp + 4], ecx
-	
-	; printf("output: %s\n", &testStr)
-	call printf
-
 .return:
 	; Free up stack space
-	add esp, 140
+	add esp, 112
 	xor eax, eax
 	; Reset stack frame and return
 	leave
@@ -601,8 +580,6 @@ SECTION .rodata
 lc8: db "*cPtr: %d, *(cPtr+8): %d", 0x0A, 0
 lc7: db "", 0x0A, 0
 lc9: db "&cs[%d]: %x", 0x0A, 0
-lc10: db "hello: ", 0
-lc11: db "output: %s", 0x0A, 0
 lc0: db "wheel size: %d, speed: %d, fuel tank capacity: %d", 0x0A, 0
 lc2: db "test", 0x0A, 0
 lc1: db "c: %d, b: %d", 0x0A, 0
