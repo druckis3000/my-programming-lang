@@ -90,9 +90,11 @@ public class Main {
 				}
 			}
 
+			// Open the project
 			ProjectManager manager = new ProjectManager();
 			manager.openProject(cmpOptions.inputFile);
 			
+			// Compile project
 			Compiler compiler = new Compiler(cmpOptions, manager);
 			compiler.compileAll();
 			
