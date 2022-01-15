@@ -32,9 +32,9 @@ public class PProgram extends PProgramPart {
 	// List of struct types defined in this source file
 	public List<PStructType> structTypes = new ArrayList<PStructType>();
 	
-	// When we're accessing global variable from another package
-	// we need to extern that global variable name, thus we collect
-	// all those names here, and extern in assembly part
+	// In order to access global variable from another package, that
+	// function must be extern, thus, they're collected in externGlobalVars
+	// and later in assembly part 'EXTERN function_name' is inserted using this list 
 	public ExternGlobalVars externGlobalVars = new ExternGlobalVars();
 	
 	public PProgram(ProjectManager pmgr){

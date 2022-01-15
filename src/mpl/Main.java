@@ -11,7 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 
-//import mpl.compiler.Compiler;
+import mpl.compiler.Compiler;
 import mpl.compiler.CompilerOptions;
 import mpl.project.ProjectManager;
 import mpl.utils.ProcessEx;
@@ -90,9 +90,11 @@ public class Main {
 				}
 			}
 
-			ProjectManager manager = new ProjectManager(cmpOptions);
-			manager.openProject();
-			manager.compileProjectFiles();
+			ProjectManager manager = new ProjectManager();
+			manager.openProject(cmpOptions.inputFile);
+			
+			Compiler compiler = new Compiler(cmpOptions, manager);
+			compiler.compileAll();
 			
 			System.out.println("");
 			new ProcessEx("sh -c ./" + manager.executableName, manager.binPath.getAbsolutePath()).start();

@@ -85,6 +85,14 @@ public class Package {
 		return null;
 	}
 	
+	public File getDirectory() {
+		return directoryPath;
+	}
+	
+	public String getName() {
+		return packageName;
+	}
+	
 	public String getFullName(){
 		String fullName = packageName;
 		

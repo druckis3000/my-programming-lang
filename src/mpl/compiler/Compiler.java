@@ -1,114 +1,220 @@
 package mpl.compiler;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.StringJoiner;
 
 import mpl.analysis.semantic.SemanticAnalyser;
-import mpl.analysis.syntactic.ASTCreator;
 import mpl.compiler.asm.AssemblyCodeBuilder;
-import mpl.syntactic.parts.PProgram;
+import mpl.project.Package;
+import mpl.project.ProjectManager;
+import mpl.project.Source;
+import mpl.syntactic.parts.PFunction;
+import mpl.utils.Env;
 import mpl.utils.ProcessEx;
+import mpl.utils.io.Console;
 import mpl.utils.io.FileHelper;
 
 public class Compiler {
-	private ASTCreator astCreator = null;
-	private SemanticAnalyser semAnalyzer = null;
-	private AssemblyCodeBuilder asmBuilder = new AssemblyCodeBuilder();
+
+	private final CompilerOptions compilerOptions;
+	private final ProjectManager projectManager;
 	
-	public Compiler(){
+	// Later will be used for finding unused functions
+	private PFunction mainFunction;
+	
+	public Compiler(CompilerOptions compilerOptions, ProjectManager projectManager) {
+		this.compilerOptions = compilerOptions;
+		this.projectManager = projectManager;
 	}
 	
-	public void compile(CompilerOptions options){
-		try {
-			// Read the source code
-			System.out.println("Reading source code...");
-			astCreator = new ASTCreator(options.inputFile, null);
+	public void compileAll() {
+		// Create AST
+		createAbstractSyntaxTrees();
+		
+		// Libraries do not require	 main function, so we
+		// don't perform this check if output format is library
+		if(compilerOptions.outputFormat != CompilerOptions.COMPILE_FORMAT_LIB){
+			boolean defined = checkIfMainIsDefined();
 			
-			// Check if tokens can form an allowable statements
-			System.out.println("Creating abstract syntax tree...");
-			PProgram program = astCreator.createAstTree();
+			// Throw an error if main function is not defined
+			if(!defined)
+				Console.throwError(Console.ERROR_UNDEFINED_MAIN_FNC);
+		}
+				
+		// Find using functions
+		findUsingFunctions();
+		
+		// Compile
+		compileProjectFiles(projectManager.getBinaryPath(), projectManager.getExecutableName());
+	}
+	
+	public void createAbstractSyntaxTrees() {
+		for(Source src : projectManager.getSourceFiles())
+			src.createAST();
+	}
+	
+	/** Do semantic analysis for source files inside @param Package
+	 * and it's sub packages */
+	private void compileToAssemblyFirstStage(Package p){
+		for(Source src : p.sourceFiles){
+			System.out.println("Compiling: " + p.getFullName() + "/" + src.fileName);
 			
-			// Check if statements are correct
-			System.out.println("Validating program...");
-			semAnalyzer = new SemanticAnalyser(program);
-			semAnalyzer.analyze();
-			
+			// Do semantic analysis
+			SemanticAnalyser analyser = new SemanticAnalyser(src.sourceAST);
+			analyser.analyze();
+		}
+		
+		// Do semantic analysis for sub-packages
+		for(Package child : p.childPackages)
+			compileToAssemblyFirstStage(child);
+	}
+	
+	/** Builds assembly code from AST for source files inside
+	 * @param Package and it's sub packages */
+	private void compileToAssemblySecondStage(Package p){
+		for(Source src : p.sourceFiles){
 			// Create assembly code
-			System.out.println("Building assembly code...");
 			AssemblyCodeBuilder.ADD_COMMENTS_BEFORE_ASSEMBLY_CODE = true;
-			asmBuilder.createAssemblyCode(program, options);
+			AssemblyCodeBuilder asmBuilder = new AssemblyCodeBuilder();
+			asmBuilder.createAssemblyCode(src.sourceAST, compilerOptions);
 			
-			int status = 0;
-			
-			String nasmFormat = "-felf" + (options.outputArch == CompilerOptions.COMPILE_ARCH_64 ? "64" : "32");
-			String gccFormat = "-m" + (options.outputArch == CompilerOptions.COMPILE_ARCH_64 ? "64" : "32");
-			
-			if(options.outputFormat == CompilerOptions.COMPILE_FORMAT_ALL){
-				// Save assembly code
-				FileHelper.writeToFile(options.outputFile + "/output.asm", asmBuilder.getAssemblyCode());
-				
-				// Compile assembly code
-				ProcessEx asm = new ProcessEx("nasm " + nasmFormat + " " + options.outputFile + "/output.asm" + " -o " + options.outputFile + "/output.o");
-				status = asm.start();
-				if(status != 0)
-					System.exit(1);
-				
-				// Link compiled assembly code
-				ProcessEx gcc = new ProcessEx("gcc " + gccFormat + " -g " + options.outputFile + "/output.o" + " -o " + options.outputFile + "/output");
-				status = gcc.start();
-				if(status != 0)
-					System.exit(1);
+			// Save assembly code
+			String asmFile = p.getDirectory() + File.separator + src.fileNameWithoutExtension + ".asm";
+			FileHelper.writeToFile(asmFile, asmBuilder.getAssemblyCode());
+		}
+		
+		// Create assembly code for sub-packages
+		for(Package child : p.childPackages)
+			compileToAssemblySecondStage(child);
+	}
+	
+	/** Check if main function is defined and checks
+	 * for it's redefinition as well */
+	private boolean checkIfMainIsDefined(){
+		boolean defined = false;
+		for(Source src : projectManager.getSourceFiles()){
+			if(!defined){
+				mainFunction = src.sourceAST.findFunctionDef("main");
+				if(mainFunction != null)
+					defined = true;
 			}else{
-				if(options.outputFormat == CompilerOptions.COMPILE_FORMAT_ASM){
-					FileHelper.writeToFile(options.outputFile, asmBuilder.getAssemblyCode());
-				}else{
-					// Save assembly code
-					File tmpAsm = File.createTempFile("splCompile", "asm");
-					FileHelper.writeToFile(tmpAsm.getAbsolutePath(), asmBuilder.getAssemblyCode());
-					
-					if(options.outputFormat == CompilerOptions.COMPILE_FORMAT_ELF){
-						// Compile assembly code
-						ProcessEx asm = new ProcessEx("nasm " + nasmFormat + " " + tmpAsm.getAbsolutePath() + " -o " + options.outputFile);
-						status = asm.start();
-						if(status != 0)
-							System.exit(1);
-					}else{
-						if(options.outputFormat == CompilerOptions.COMPILE_FORMAT_LIB){
-							// Compile assembly code
-							File tmpElf = File.createTempFile("splCompile", "o");
-							ProcessEx asm = new ProcessEx("nasm " + nasmFormat + " " + tmpAsm.getAbsolutePath() + " -o " + tmpElf.getAbsolutePath());
-							status = asm.start();
-							if(status != 0)
-								System.exit(1);
-							
-							// Compile object file to shared library
-							ProcessEx shared = new ProcessEx("gcc " + gccFormat + " -shared " + tmpElf.getAbsolutePath() + " -o " + options.outputFile);
-							status = shared.start();
-							if(status != 0)
-								System.exit(1);
-						}else{
-							// Compile assembly code
-							File tmpElf = File.createTempFile("splCompile", "o");
-							ProcessEx asm = new ProcessEx("nasm " + nasmFormat + " " + tmpAsm.getAbsolutePath() + " -o " + tmpElf.getAbsolutePath());
-							status = asm.start();
-							if(status != 0)
-								System.exit(1);
-							
-							// Link compiled assembly code
-							ProcessEx gcc = new ProcessEx("gcc " + gccFormat + " -g " + tmpElf.getAbsolutePath() + " -o " + options.outputFile);
-							status = gcc.start();
-							if(status != 0)
-								System.exit(1);
-						}
-					}
+				PFunction anotherMainFnc = src.sourceAST.findFunctionDefOrDecl("main");
+				if(anotherMainFnc != null){
+					// Redefinition of main function
+					Console.throwError(Console.ERROR_FUNCTION_REDEFINITION, anotherMainFnc.sourceFileName, anotherMainFnc.lineInSourceCode, anotherMainFnc.columnInSourceCode,
+							mainFunction.sourceFileName, mainFunction.lineInSourceCode);
 				}
 			}
-			
-			// Run the program
-			if(options.outputFormat != CompilerOptions.COMPILE_FORMAT_LIB)
-				new ProcessEx("sh -c ./output", "/home/daslee/Desktop").start();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
+		
+		return defined;
+	}
+	
+	private void findUsingFunctions(){
+		// TODO: Finish this
+	}
+	
+	private void printAstTrees(Package p){
+		/*for(Source src : p.sourceFiles){
+			System.out.println(src.sourceAST.getAstCode(""));
+			System.out.println();
+		}*/
+		
+		// Print sub-packages
+		for(Package child : p.childPackages)
+			printAstTrees(child);
+	}
+	
+	/** Compiles project source files into assembly format */
+	public void buildAssemblyCode(){
+		// Do semantic analysis
+		compileToAssemblyFirstStage(projectManager.getRootPackage());
+		
+		// Create actual assembly code
+		compileToAssemblySecondStage(projectManager.getRootPackage());
+		
+		printAstTrees(projectManager.getRootPackage());
+	}
+	
+	/** Compiles project source files into elf files
+	 * 
+	 * @return List of compiled files absolute paths */
+	public ArrayList<String> compileSourceToElf(String binaryDirPath){
+		buildAssemblyCode();
+		
+		// List of paths to all project elf files
+		ArrayList<String> paths = new ArrayList<String>();
+		
+		// Compile root package and it's sub-packages
+		paths.addAll(compileSourceToElf(projectManager.getRootPackage(), binaryDirPath));
+		
+		return paths;
+	}
+	
+	/** Compile source files in @param Package and it's sub-packages */
+	private ArrayList<String> compileSourceToElf(Package p, String binaryDirPath){
+		ArrayList<String> paths = new ArrayList<String>();
+		
+		// Iterate over all source files in package
+		for(Source src : p.sourceFiles){
+			// Find the assembly file
+			String asmFilePath = p.getDirectory() + File.separator + src.fileNameWithoutExtension + ".asm";
+			
+			// Create elf output file path
+			String elfFilePath = binaryDirPath + File.separator + src.fileNameWithoutExtension + "." + Env.getElfExtension();
+			paths.add(elfFilePath);
+			
+			// Call the nasm assembler
+			String nasmFormat = "-f" + Env.getElfFormat() + (compilerOptions.outputArch == CompilerOptions.COMPILE_ARCH_64 ? "64" : "32");
+			ProcessEx nasm = new ProcessEx(new String[] {"nasm", nasmFormat, asmFilePath, "-o", elfFilePath});
+			
+			int status = nasm.start();
+			if(status != 0)
+				System.exit(1);
+		}
+		
+		// Compile sub-packages
+		for(Package child : p.childPackages)
+			paths.addAll(compileSourceToElf(child, binaryDirPath));
+		
+		return paths;
+	}
+	
+	/** Comples project into executable file */
+	public void compileProjectFiles(String binaryDirPath, String executableName){
+		ArrayList<String> elfFiles = compileSourceToElf(binaryDirPath);
+		
+		// Save settings
+		//settings.saveSettings();
+		
+		// Create gcc compiler parameters
+		String gccFormat = "-m" + (compilerOptions.outputArch == CompilerOptions.COMPILE_ARCH_64 ? "64" : "32");
+		
+		// Create string of all elf files
+		StringJoiner elfFilesList = new StringJoiner(" ");
+		elfFiles.forEach(path -> elfFilesList.add(path));
+		
+		// Create executable path
+		String executablePath = binaryDirPath + File.separator + executableName + Env.getExecutableExtension();
+		
+		// Wrap gcc command and it's arguments around elf files
+		// to make gcc process command array
+		elfFiles.add(0, "-g");
+		elfFiles.add(0, gccFormat);
+		elfFiles.add(0, "gcc");
+		elfFiles.add("-o");
+		elfFiles.add(executablePath);
+
+		// Call the gcc compiler
+		String[] cmdArray = elfFiles.toArray(new String[elfFiles.size()]);
+		ProcessEx gcc = new ProcessEx(cmdArray);
+		int status = gcc.start();
+		if(status != 0)
+			System.exit(1);
+	}
+	
+	public CompilerOptions getOptions() {
+		return compilerOptions;
 	}
 }
