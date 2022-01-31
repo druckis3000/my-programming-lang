@@ -5,25 +5,35 @@ import java.io.File;
 import mpl.analysis.syntactic.ASTCreator;
 import mpl.syntactic.parts.PProgram;
 
-/* Class that holds information about source file.
- * It also has reference to the abstract syntax tree (PProgram)
- * of this source file. */
+/**
+ * Source class that holds all necessary information about source file.
+ * It also have {@link mpl.syntactic.parts.PProgram} member which references
+ * to the abstract syntax tree of this source file.
+ * 
+ * In order to create source file, call {@link #open(File, Package)},
+ * after source is opened successfully, call {@link #createAST()} to create AST
+ */
 public class Source {
 	public static final int ERROR_NON_EXISTING_FILE = 1;
 	
-	private File sourceFile;
+	protected File sourceFile;
 	public String fileName;
 	public String fileNameWithoutExtension;
 	public Package pkg;
 	public PProgram sourceAST;
-	public boolean modified = true;
+	public boolean modified = false;
+	public boolean compiled = false;
+	public boolean containsMainFunction = false;
 
 	public Source() {
 	}
 
-	/** Opens source file, and creates Abstract Syntax Tree
+	/**
+	 * @param path - Absolute path to the source file
+	 * @param pkg - Package of this source file
 	 * 
-	 *  @return Error code if there's any, otherwise 0 is returned */
+	 * @return Error code if there's any, 0 is returned if no errors.
+	 */
 	public int open(File path, Package pkg){
 		// Check if file exists
 		if(!path.exists()){
@@ -47,13 +57,19 @@ public class Source {
 		return 0;
 	}
 	
+	/**
+	 * Creates abstract syntax tree for this {@link Source} file
+	 */
 	public void createAST() {
+		String pkgFullName = pkg.getFullName();
+		if(pkgFullName.length() > 0) pkgFullName += File.separator;
+		
 		// Read the source code
-		System.out.println("Reading source code from file '" + pkg.packageName + File.separator + fileName + "'...");
+		System.out.println("Reading source code from file '" + pkgFullName + fileName + "'...");
 		ASTCreator astCreator = new ASTCreator(sourceFile, pkg.projectManager);
 		
 		// Check if tokens can form an allowable statements
-		System.out.println("Creating abstract syntax tree for file '" + pkg.packageName + File.separator + fileName + "'...");
+		System.out.println("Creating abstract syntax tree for file '" + pkgFullName + fileName + "'...");
 		this.sourceAST = astCreator.createAstTree();
 		
 		// Set source object in AST

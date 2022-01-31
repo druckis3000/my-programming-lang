@@ -16,6 +16,7 @@ public class ProjectManager {
 	// Packages & sources
 	protected Package rootPackage;
 	protected ArrayList<Source> allSourceFiles = new ArrayList<Source>();
+	protected ArrayList<Source> modifiedSourceFiles = new ArrayList<Source>();
 	
 	public ProjectManager() {
 	}
@@ -44,7 +45,7 @@ public class ProjectManager {
 		srcPath = new File(directory.getAbsolutePath() + File.separator + "src");
 		binPath = new File(directory.getAbsolutePath() + File.separator + "bin");
 		
-		// Read settings
+		// Create settings
 		settings = new SettingsFile(directory.getAbsolutePath(), this);
 		
 		// Set executable name
@@ -64,55 +65,68 @@ public class ProjectManager {
 		rootPackage.openPackageSourceFiles(srcPath, null, true);
 		
 		// Find all source files
-		findAllSourceFiles(rootPackage);
+		getAllSourceFiles(rootPackage);
 		
-		// Read files settings
-		//settings.readSettings();
+		// Read project settings
+		settings.readSettings();
 		
 		return 0;
 	}
 	
-	/** Finds package by specified name */
+	/**
+	 * Update and save project settings
+	 */
+	public void close() {
+		settings.updateSettings();
+		settings.saveSettings();
+	}
+	
+	public void debug() {
+		
+	}
+	
+	/**
+	 * Find package by it's full name in currently opened project
+	 * 
+	 * @param fullName - full name of the package, e.g.: main/subpackage/memory
+	 * 
+	 * @return {@link mpl.project.Package} object is returned if package was found, null if not found
+	 */
 	public Package findPackage(String fullName){
 		// Check if it's a root package
 		if(fullName.equals(""))
 			return rootPackage;
 		
 		if(fullName.contains("/")){
+			// Get list/of/sub-packages
 			String[] splitPackages = fullName.split("/");
 			
-			int i = 1;
-			Package nextPackage = rootPackage.findPackage(splitPackages[i]);
-			while(nextPackage != null){
-				rootPackage = nextPackage;
-				
-				i++;
-				if(i == splitPackages.length)
-					break;
-				
-				nextPackage = rootPackage.findPackage(splitPackages[i]);
+			// Iterate over sub-packages and look for specified package name
+			Package nextPackage = rootPackage;
+			for(int i=0; i < splitPackages.length && nextPackage != null; i++) {
+				nextPackage = nextPackage.findPackage(splitPackages[i]);
 			}
 			
-			if(nextPackage == null && i < splitPackages.length)
-				return null;
+			return nextPackage;
 		}else{
-			// Package in root src folder
+			// Package in root folder
 			Package childPackage = rootPackage.findPackage(fullName);
 			return childPackage;
 		}
-		
-		return null;
 	}
 	
-	/** Finds all source files inside @param Package and sub packages,
-	 * and puts them into the list (allSourceFiles) */
-	private void findAllSourceFiles(Package p){
+	/**
+	 * Finds all source files in currently opened project,
+	 * and puts them into the array list
+	 */
+	private void getAllSourceFiles(Package p){
+		// Get sources from specified package
 		for(Source src : p.sourceFiles)
 			allSourceFiles.add(src);
 		
-		// Find in sub-packages
+		// Get sources from sub-packages
 		for(Package child : p.childPackages)
-			findAllSourceFiles(child);
+			getAllSourceFiles(child);
 	}
 	
 	public ArrayList<Source> getSourceFiles(){
@@ -131,19 +145,32 @@ public class ProjectManager {
 		return executableName;
 	}
 	
+	/**
+	 * Prints packages and sources tree
+	 */
 	public void printProjectTree(){
-		printSubpackages(rootPackage, "");
+		printPackageTree(rootPackage, "");
 	}
 	
-	private void printSubpackages(Package p, String tabs){
-		System.out.println(tabs + p.getFullName());
+	/**
+	 * Prints specified package and it's sub-packages tree, including sources
+	 * 
+	 * @param p - package to print
+	 * @param tabs - number of tabs to add
+	 */
+	private void printPackageTree(Package p, String tabs){
+		// Print package full name
+		if(!p.isRootPackage)
+			System.out.println(tabs + p.getFullName());
 		
+		// Print package source files
 		for(Source f : p.sourceFiles){
-			System.out.println(tabs + "\t" + f.fileName);
+			System.out.println(tabs + " - " + f.fileName);
 		}
 		
+		// Print sub-package trees
 		for(Package pkg : p.childPackages){
-			printSubpackages(pkg, tabs + "\t");
+			printPackageTree(pkg, tabs + "\t");
 		}
 	}
 }

@@ -10,7 +10,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-
 import mpl.compiler.Compiler;
 import mpl.compiler.CompilerOptions;
 import mpl.project.ProjectManager;
@@ -90,7 +89,7 @@ public class Main {
 				}
 			}
 
-			// Open the project
+			// Open project
 			ProjectManager manager = new ProjectManager();
 			manager.openProject(cmpOptions.inputFile);
 			
@@ -98,6 +97,10 @@ public class Main {
 			Compiler compiler = new Compiler(cmpOptions, manager);
 			compiler.compileAll();
 			
+			// Close project
+			manager.close();
+			
+			// Run executable
 			System.out.println("");
 			new ProcessEx("sh -c ./" + manager.executableName, manager.binPath.getAbsolutePath()).start();
 		} catch (ParseException e) {

@@ -54,12 +54,12 @@ public class Compiler {
 			src.createAST();
 	}
 	
-	/** Do semantic analysis for source files inside @param Package
-	 * and it's sub packages */
+	/**
+	 * Do semantic analysis for source files inside @param Package
+	 * and it's sub packages
+	 */
 	private void compileToAssemblyFirstStage(Package p){
 		for(Source src : p.sourceFiles){
-			System.out.println("Compiling: " + p.getFullName() + "/" + src.fileName);
-			
 			// Do semantic analysis
 			SemanticAnalyser analyser = new SemanticAnalyser(src.sourceAST);
 			analyser.analyze();
@@ -70,10 +70,19 @@ public class Compiler {
 			compileToAssemblyFirstStage(child);
 	}
 	
-	/** Builds assembly code from AST for source files inside
-	 * @param Package and it's sub packages */
+	/**
+	 * Builds assembly code from AST for source files inside
+	 * @param Package and it's sub packages
+	 */
 	private void compileToAssemblySecondStage(Package p){
 		for(Source src : p.sourceFiles){
+			if(src.modified == false) {
+				System.out.println("Ignoring unmodified source: " + p.getFullName() + "/" + src.fileName);
+				continue;
+			}else{
+				System.out.println("Compiling: " + p.getFullName() + "/" + src.fileName);
+			}
+			
 			// Create assembly code
 			AssemblyCodeBuilder.ADD_COMMENTS_BEFORE_ASSEMBLY_CODE = true;
 			AssemblyCodeBuilder asmBuilder = new AssemblyCodeBuilder();
@@ -82,6 +91,9 @@ public class Compiler {
 			// Save assembly code
 			String asmFile = p.getDirectory() + File.separator + src.fileNameWithoutExtension + ".asm";
 			FileHelper.writeToFile(asmFile, asmBuilder.getAssemblyCode());
+			
+			// Set compiled flag
+			src.compiled = true;
 		}
 		
 		// Create assembly code for sub-packages
@@ -108,6 +120,11 @@ public class Compiler {
 			}
 		}
 		
+		if(defined) {
+			// Update containsMainFunction
+			mainFunction.getProgram().source.containsMainFunction = true;
+		}
+		
 		return defined;
 	}
 	
@@ -116,11 +133,6 @@ public class Compiler {
 	}
 	
 	private void printAstTrees(Package p){
-		/*for(Source src : p.sourceFiles){
-			System.out.println(src.sourceAST.getAstCode(""));
-			System.out.println();
-		}*/
-		
 		// Print sub-packages
 		for(Package child : p.childPackages)
 			printAstTrees(child);
@@ -185,9 +197,6 @@ public class Compiler {
 	public void compileProjectFiles(String binaryDirPath, String executableName){
 		ArrayList<String> elfFiles = compileSourceToElf(binaryDirPath);
 		
-		// Save settings
-		//settings.saveSettings();
-		
 		// Create gcc compiler parameters
 		String gccFormat = "-m" + (compilerOptions.outputArch == CompilerOptions.COMPILE_ARCH_64 ? "64" : "32");
 		
@@ -207,11 +216,14 @@ public class Compiler {
 		elfFiles.add(executablePath);
 
 		// Call the gcc compiler
+		System.out.println("Creating executable file...");
 		String[] cmdArray = elfFiles.toArray(new String[elfFiles.size()]);
 		ProcessEx gcc = new ProcessEx(cmdArray);
 		int status = gcc.start();
-		if(status != 0)
+		if(status != 0) {
+			System.err.println("Error: gcc returned: " + status);
 			System.exit(1);
+		}
 	}
 	
 	public CompilerOptions getOptions() {

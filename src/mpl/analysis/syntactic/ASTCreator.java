@@ -100,7 +100,6 @@ public class ASTCreator {
 			sourceFile = file.getName();
 			this.projectManager = projectManager;
 			lexer = new HelloLexer(CharStreams.fromFileName(file.getAbsolutePath()));
-			// new ANTLRInputStream(new FileReader(file))
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -145,20 +144,20 @@ public class ASTCreator {
 			super.enterImportStatement(ctx);
 			
 			// Remove quotes from import statement
-			String importPackage = ctx.StringLiteral().getText();
-			importPackage = importPackage.substring(1, importPackage.length()-1);
+			String importSource = ctx.StringLiteral().getText();
+			importSource = importSource.substring(1, importSource.length()-1);
 			
 			// Create package path
 			String packagePath = "";
-			if(importPackage.contains("/"))
-				packagePath = importPackage.substring(0, importPackage.lastIndexOf("/"));
+			if(importSource.contains("/"))
+				packagePath = importSource.substring(0, importSource.lastIndexOf("/"));
 			
 			// Create source name
 			String sourceName = "";
-			if(importPackage.contains("/"))
-				sourceName = importPackage.substring(importPackage.lastIndexOf("/")+1, importPackage.length());
+			if(importSource.contains("/"))
+				sourceName = importSource.substring(importSource.lastIndexOf("/")+1, importSource.length());
 			else
-				sourceName = importPackage;
+				sourceName = importSource;
 			
 			// Find the package
 			mpl.project.Package pkg = program.projectManager.findPackage(packagePath);
@@ -172,7 +171,7 @@ public class ASTCreator {
 			Source src = pkg.findSource(sourceName);
 			if(src == null){
 				// Source was not found
-				System.err.println("Unable to import '" + importPackage + "', file is not existing");
+				System.err.println("Unable to import '" + importSource + "', file is not existing");
 				return;
 			}
 			
