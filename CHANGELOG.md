@@ -4,6 +4,7 @@
 
 - Implemented project settings feature. Now when compiling project, compiler only compiles modified source files
 - Added more comments in src/mpl/project/* source files
+- Added function in src/mpl/utils/io/FileHelper for generating SHA-1 checksum for source files
 
 ## Fixed
 
